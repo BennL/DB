@@ -2,14 +2,19 @@ program DataBase;
 
 {$mode objfpc}{$H+}
 
-uses
-  {$IFDEF UNIX}{$IFDEF UseCThreads}
-  cthreads,
-  {$ENDIF}{$ENDIF}
+uses {$IFDEF UNIX} {$IFDEF UseCThreads}
+  cthreads, {$ENDIF} {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, main, metadata, utableform, querycreate, ufilter, ueditform,
-UFilterForm
-  { you can add units after this };
+  Forms,
+  main,
+  metadata,
+  utableform,
+  querycreate,
+  ufilter,
+  ueditform,
+  UFilterForm,
+  DBComponentCreate,
+  UEdit { you can add units after this };
 
 {$R *.res}
 
@@ -22,4 +27,3 @@ begin
   Application.CreateForm(TFilterForm, FilterForm);
   Application.Run;
 end.
-
