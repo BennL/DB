@@ -7,7 +7,7 @@ interface
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, Grids,
   StdCtrls, Buttons, ExtCtrls, metadata, sqldb, DB, querycreate,
-  DBComponentCreate, UFilterForm, ufilter, ueditform;
+  DBComponentCreate, UFilterForm, ufilter, ueditform, UCheckGroupForm;
 
 type
   TCurrColRow = record
@@ -31,6 +31,7 @@ type
   { TScheduleForm }
 
   TScheduleForm = class(TForm)
+    CheckColBitBtn: TBitBtn;
     ResetBtn: TBitBtn;
     InterfaceImage: TImageList;
     LabelY: TLabel;
@@ -44,6 +45,9 @@ type
     YComboBox: TComboBox;
     DataSource: TDataSource;
     procedure AddFiltersClick(Sender: TObject);
+    procedure CheckGroupItemClick(Sender: TObject; Index: integer);
+    procedure OnCheckGroupFormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure CheckColBitBtnClick(Sender: TObject);
     procedure DrawGridClick(Sender: TObject);
     procedure DrawGridMouseDown(Sender: TObject; Button: TMouseButton;
       Shift: TShiftState; X, Y: integer);
@@ -128,6 +132,42 @@ begin
     FilterTable := ScheduleTable;
     OKBitBtn.OnClick := @OKBtnClick;
     OnClose := @OnFilterFormClose;
+    Show;
+  end;
+end;
+
+procedure TScheduleForm.CheckGroupItemClick(Sender: TObject; Index: integer);
+var
+  i: integer;
+  Count: integer;
+begin
+  Count := 0;
+
+  VisibleColumn[Index] := TCheckGroup(Sender).Checked[Index];
+
+  for i := 0 to high (VisibleColumn) do begin
+    if (VisibleColumn[i]) then inc (Count);
+  end;
+
+  CurrentHeight := Count * 20;
+
+  DrawGrid.Invalidate;
+
+  with DrawGrid do
+    for i := 1 to RowCount - 1 do
+      RowHeights[i] := CurrentHeight;
+end;
+
+procedure TScheduleForm.CheckColBitBtnClick(Sender: TObject);
+var
+  NewForm: TCheckGroupForm;
+begin
+  TBitBtn(Sender).Enabled := False;
+  NewForm := TCheckGroupForm.Create(Self, VisibleColumn, FCols);
+  with NewForm do
+  begin
+    CheckGroup.OnItemClick := @CheckGroupItemClick;
+    OnClose := @OnCheckGroupFormClose;
     Show;
   end;
 end;
@@ -406,10 +446,10 @@ var
   NewForm: TEditForm;
   CurrCB, CurrCol: TPoint;
 begin
-//  CurrCB.X := XComboBox.ItemIndex;
-//  CurrCB.Y := YComboBox.ItemIndex;
-//  CurrCol.X := Grid.Col - 1;
-//  CurrCol.Y := Grid.Row - 1;
+  CurrCB.X := XComboBox.ItemIndex;
+  CurrCB.Y := YComboBox.ItemIndex;
+  CurrCol.X := DrawGrid.Col - 1;
+  CurrCol.Y := DrawGrid.Row - 1;
 
   with (aRect) do
   begin
@@ -418,10 +458,10 @@ begin
       if (Left < X) and (Right > X) and (Top < Y) and (Bottom > Y) then
       begin
         if (IsInsert) then
-          NewForm := TEditForm.Create(ScheduleForm, ScheduleTable, 0)
+          NewForm := TEditForm.Create(ScheduleForm, ScheduleTable, 0, CurrCB, CurrCol)
         else
           NewForm := TEditForm.Create(ScheduleForm, ScheduleTable,
-            Items[CurRow - 1][CurCol - 1][CurRecord].ID);
+            Items[CurRow - 1][CurCol - 1][CurRecord].ID, CurrCB, CurrCol);
         NewForm.OnClose := @EditFormClose;
         NewForm.Show;
       end;
@@ -432,6 +472,12 @@ end;
 procedure TScheduleForm.OKBtnClick(Sender: TObject);
 begin
   RefreshInfo;
+end;
+
+procedure TScheduleForm.OnCheckGroupFormClose(Sender: TObject;
+  var CloseAction: TCloseAction);
+begin
+  CheckColBitBtn.Enabled := True;
 end;
 
 procedure TScheduleForm.OnFilterFormClose(Sender: TObject;

@@ -32,7 +32,8 @@ type
     MSQLQuery: TSQLQuery;
     IsInsert: boolean;
     MTransaction: TSQLTransaction;
-    constructor Create(TheOwner: TComponent; aTable: TTableInfo; aID: integer);
+    constructor Create(TheOwner: TComponent; aTable: TTableInfo; aID: integer;
+      aCurrCB, aCurrCol: TPoint);
     procedure BtnsCreate;
   end;
 
@@ -115,7 +116,7 @@ end;
 { TEditForm }
 
 constructor TEditForm.Create(TheOwner: TComponent; aTable: TTableInfo;
-  aID: integer);
+  aID: integer; aCurrCB, aCurrCol: TPoint);
 const
   BtnSize = 60;
 var
@@ -138,7 +139,7 @@ begin
   begin
     if ETable.ColumnInfos[i].VisibleColumn then
     begin
-      ListOfEditors.AddEditor(Self, ID, ETable);
+      ListOfEditors.AddEditor(Self, ID, ETable, aCurrCB, aCurrCol);
     end;
   end;
   Self.Height := Self.Height + BtnSize;

@@ -14,7 +14,8 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   ueditform,
   UFilterForm,
   DBComponentCreate,
-  UEdit, UScheduleForm { you can add units after this };
+  UEdit, UScheduleForm, UCheckBoxFrame,
+UCheckGroupForm { you can add units after this };
 
 {$R *.res}
 
@@ -26,5 +27,6 @@ begin
   Application.CreateForm(TEditForm, EditForm);
   Application.CreateForm(TFilterForm, FilterForm);
   Application.CreateForm(TScheduleForm, ScheduleForm);
+  Application.CreateForm(TCheckGroupForm, CheckGroupForm);
   Application.Run;
 end.

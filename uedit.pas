@@ -19,16 +19,19 @@ type
     CurrentCaption: string;
     IDs: array of integer;
     EDBComBo: TComboBox;
+    CountComboBox: integer;
     EColumn: TColumnInfo;
     EDBSQLQuery: TSQLQuery;
     ColumnIndex: integer;
     ID: integer;
+    CurrCB, CurrCol: TPoint;
     IsReference: boolean;
   private
     procedure CreateInrterface(aOwner: TWinControl; CurrID: integer);
     procedure SetComboBoxItems(CurrID: integer);
   public
-    constructor Create(aOwner: TWinControl; aColumn: TColumnInfo; aID: integer);
+    constructor Create(aOwner: TWinControl; aColumn: TColumnInfo; aID: integer;
+      aCurrCB, aCurrCol: TPoint; aIndex: integer);
     destructor Destroy; override;
   end;
 
@@ -42,7 +45,8 @@ type
     MSQLQuery: TSQLQuery;
     MTransaction: TSQLTransaction;
     destructor Destroy; override;
-    procedure AddEditor(aOwner: TWinControl; aID: integer; aTable: TTableInfo);
+    procedure AddEditor(aOwner: TWinControl; aID: integer; aTable: TTableInfo;
+      aCurrCB, aCurrCol: TPoint);
     function DeleteQuery: string;
     function InsertEdit: string;
     function UpdateEdit: string;
@@ -55,7 +59,8 @@ var
 
 implementation
 
-constructor TDBEditor.Create(aOwner: TWinControl; aColumn: TColumnInfo; aID: integer);
+constructor TDBEditor.Create(aOwner: TWinControl; aColumn: TColumnInfo;
+  aID: integer; aCurrCB, aCurrCol: TPoint; aIndex: integer);
 var
   TempSQLQuery: TSQLQuery;
   TempTable: TTableInfo;
@@ -63,6 +68,9 @@ begin
   EColumn := aColumn;
   ID := aID;
   IsReference := EColumn.Reference;
+  CurrCB := aCurrCB;
+  CurrCol := aCurrCol;
+  CountComboBox := aIndex;
 
   TempSQLQuery := SQLQueryCreate();
   TempTable := GetTableByColumn(EColumn);
@@ -155,21 +163,14 @@ begin
       LookUpQuery.Next;
     end;
 
-    //if (CurrCB.X <> 0) then
-    //begin
-    //  if CurrID = 0 then
-    //    EDBComBo.ItemIndex := CurrID
-    //  else
-    //  if (IsInsert) then
-    //    EDBComBo.ItemIndex := CurrID
-    //  else
-    //    EDBComBo.ItemIndex := CurrID - 1;
-    //  if (ColumnIndex - 1 = CurrCB.X) then
-    //    EDBComBo.Enabled := False;
-    //  if (ColumnIndex - 1 = CurrCB.Y) then
-    //    EDBComBo.Enabled := False;
-    //end;
-
+    if (CountComboBox = CurrCB.X) or (CountComboBox = CurrCB.Y) then
+    begin
+      Enabled := false;
+      if CountComboBox = CurrCB.X then
+        ItemIndex := CurrCol.X;
+      if CountComboBox = CurrCB.Y then
+        ItemIndex := CurrCol.Y;
+    end;
 
     FreeAndNil(LookUpQuery);
   end;
@@ -183,7 +184,8 @@ begin
   FreeAndNil(EPanel);
 end;
 
-procedure TDBEditors.AddEditor(aOwner: TWinControl; aID: integer; aTable: TTableInfo);
+procedure TDBEditors.AddEditor(aOwner: TWinControl; aID: integer;
+  aTable: TTableInfo; aCurrCB, aCurrCol: TPoint);
 begin
   SetLength(DBEditors, length(DBEditors) + 1);
   ETable := aTable;
@@ -191,7 +193,8 @@ begin
   ID := aID;
 
   DBEditors[high(DBEditors)] :=
-    TDBEditor.Create(aOwner, ETable.ColumnInfos[Length(DBEditors)], ID);
+    TDBEditor.Create(aOwner, ETable.ColumnInfos[Length(DBEditors)], ID, aCurrCB,
+      aCurrCol, high(DBEditors));
 end;
 
 function TDBEditors.DeleteQuery: string;

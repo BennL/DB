@@ -136,9 +136,15 @@ var
   NewForm: TEditForm;
   HashResult: integer;
   CurrID: integer;
+  CurrComboBox, CurrCol: TPoint;
 begin
+  CurrComboBox.X := -1;
+  CurrComboBox.Y := -1;
+  CurrCol.X := -1;
+  CurrCol.Y  := -1;
+
   CurrID := SQLQuery.Fields[0].AsInteger;
-  NewForm := TEditForm.Create(Self, MTable, CurrID);
+  NewForm := TEditForm.Create(Self, MTable, CurrID, CurrComboBox, CurrCol);
   with ListOfEditForm do
   begin
     HashResult := HashFunction(CurrID);
@@ -162,9 +168,15 @@ end;
 procedure TTableForm.InsertBitBtnClick(Sender: TObject);
 var
   NewForm: TEditForm;
+  CurrComboBox, CurrCol: TPoint;
 begin
+  CurrComboBox.X := -1;
+  CurrComboBox.Y := -1;
+  CurrCol.X := -1;
+  CurrCol.Y  := -1;
+
   TBitBtn(Sender).Enabled := false;
-  NewForm := TEditForm.Create(Self, MTable, 0);
+  NewForm := TEditForm.Create(Self, MTable, 0, CurrComboBox, CurrCol);
   with NewForm do
   begin
     OnClose := @OnEditFormClose;
