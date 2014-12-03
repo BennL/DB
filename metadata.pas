@@ -25,6 +25,8 @@ type
     ParentTable: string;
   end;
 
+  TColumnInfos = array of TColumnInfo;
+
   { TTableInfo }
 
   TTableInfo = class

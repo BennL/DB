@@ -14,8 +14,8 @@ uses {$IFDEF UNIX} {$IFDEF UseCThreads}
   ueditform,
   UFilterForm,
   DBComponentCreate,
-  UEdit, UScheduleForm, UCheckBoxFrame,
-UCheckGroupForm { you can add units after this };
+  UEdit, UScheduleForm,
+UCheckGroupForm, UExport { you can add units after this };
 
 {$R *.res}
 

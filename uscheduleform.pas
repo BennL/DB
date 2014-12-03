@@ -31,6 +31,7 @@ type
   { TScheduleForm }
 
   TScheduleForm = class(TForm)
+    ExportBitBtn: TBitBtn;
     CheckColBitBtn: TBitBtn;
     ResetBtn: TBitBtn;
     InterfaceImage: TImageList;
@@ -46,6 +47,7 @@ type
     DataSource: TDataSource;
     procedure AddFiltersClick(Sender: TObject);
     procedure CheckGroupItemClick(Sender: TObject; Index: integer);
+    procedure ExportBitBtnClick(Sender: TObject);
     procedure OnCheckGroupFormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure CheckColBitBtnClick(Sender: TObject);
     procedure DrawGridClick(Sender: TObject);
@@ -93,6 +95,8 @@ var
   ListOfEditForm: TListOfEditForm;
 
 implementation
+uses
+  UExport;
 
 {$R *.lfm}
 
@@ -156,6 +160,12 @@ begin
   with DrawGrid do
     for i := 1 to RowCount - 1 do
       RowHeights[i] := CurrentHeight;
+end;
+
+procedure TScheduleForm.ExportBitBtnClick(Sender: TObject);
+begin
+  SchExport.ExportToFile(Items, XTitles, YTitles, FCols[XComboBox.ItemIndex],
+    FCols[YComboBox.ItemIndex], ListOfFilters, FCols);
 end;
 
 procedure TScheduleForm.CheckColBitBtnClick(Sender: TObject);
