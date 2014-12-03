@@ -10,12 +10,16 @@ uses
 
 procedure ShowItems(SQLQuery: TSQLQuery; DBGrid: TDBGrid; aTable: TTable);
 procedure SetCaptions(DBGrid: TDBGrid; uTable: Ttable);
-function CreateQuery(uTable: Ttable): string;
 procedure SendQuery(SQLQuery: TSQLQuery; aQuery: string);
+procedure ShowFilterResults(sqlquery: TSQLQuery; dbgrid: TDBGrid;
+  aTable: TTable; aFilterQuery: string; aParameters: array of string);
+procedure ShowOrderByResults(sqlquery: TSQLQuery; dbgrid: TDBGrid;
+  aTable: TTable; aOrderByQuery: string);
+function CreateQuery(uTable: Ttable): string;
 
 implementation
 
-procedure setcaptions(dbgrid: tdbgrid; utable: ttable);
+procedure SetCaptions(dbgrid: tdbgrid; utable: ttable);
 var
   i: integer;
 begin
@@ -26,7 +30,7 @@ begin
   end;
 end;
 
-function createquery(utable: ttable): string;
+function CreateQuery(utable: ttable): string;
 var
   i: integer;
 begin
@@ -52,7 +56,7 @@ begin
   end;
 end;
 
-procedure sendquery(sqlquery: tsqlquery; aquery: string);
+procedure SendQuery(sqlquery: tsqlquery; aquery: string);
 begin
   SQLQuery.Close;
   SQLQuery.Params.Clear;
@@ -60,10 +64,37 @@ begin
   SQLQuery.Open;
 end;
 
-procedure showitems(sqlquery: tsqlquery; dbgrid: tdbgrid; atable: ttable);
+procedure SendParamQuery(sqlquery: tsqlquery; aquery: string;
+  aParameters: array of string);
+var
+  i: integer;
 begin
-  SendQuery (SQLQuery, createquery (atable));
+  SQLQuery.Close;
+  SQLQuery.Params.Clear;
+  SQLQuery.SQL.Text := aquery;
+  for i := 0 to high(aParameters) do
+    SQLQuery.ParamByName('p' + IntToStr(i)).AsString := aParameters[i];
+  SQLQuery.Open;
+end;
+
+procedure ShowItems(sqlquery: tsqlquery; dbgrid: tdbgrid; atable: ttable);
+begin
+  SendQuery(SQLQuery, createquery(atable));
   SetCaptions(DBGrid, atable);
+end;
+
+procedure ShowFilterResults(sqlquery: TSQLQuery; dbgrid: TDBGrid;
+  aTable: TTable; aFilterQuery: string; aParameters: array of string);
+begin
+  SendParamQuery(sqlquery, CreateQuery(aTable) + aFilterQuery, aParameters);
+  setcaptions(DBGrid, aTable);
+end;
+
+procedure ShowOrderByResults(sqlquery: TSQLQuery; dbgrid: TDBGrid;
+  aTable: TTable; aOrderByQuery: string);
+begin
+  sendquery(sqlquery, CreateQuery(aTable) + aOrderByQuery);
+  setcaptions(DBGrid, aTable);
 end;
 
 end.

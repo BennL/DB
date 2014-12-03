@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 509
+  Left = 172
   Height = 84
-  Top = 277
-  Width = 236
+  Top = 347
+  Width = 226
   Caption = 'MainForm'
   Color = 16775156
   Menu = MainMenu
@@ -16,6 +16,7 @@ object MainForm: TMainForm
     Password = 'masterkey'
     Transaction = SQLTransaction
     UserName = 'sysdba'
+    CharSet = 'UTF-8'
     HostName = 'localhost'
     LogEvents = []
     left = 88

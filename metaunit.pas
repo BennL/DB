@@ -1,82 +1,82 @@
-unit MetaUnit;
+Unit MetaUnit;
 
 {$mode objfpc}{$H+}
 
-interface
+Interface
 
-uses
+Uses
   Classes, SysUtils, DB, DBGrids, DBCtrls, sqldb, Menus, Dialogs;
 
-type
+Type
 
   { TColumn }
 
-  TColumn = object
-    Name: string;
-    Caption: string;
-    ReferenceTable: string;
-    ReferenceName: string;
-    Size: integer;
-    function IsReference: boolean; inline;
-  end;
+  TColumn = Object
+    Name: String;
+    Caption: String;
+    ReferenceTable: String;
+    ReferenceName: String;
+    Size: Integer;
+    Function IsReference: Boolean; Inline;
+  End;
 
-  TColumns = array of TColumn;
+  TColumns = Array Of TColumn;
 
   { TTable }
 
-  TTable = class
+  TTable = Class
     ColumnInfos: TColumns;
-    TCaption: string;
-    TName: string;
+    TCaption: String;
+    TName: String;
     TColumn: TColumns;
-    function AddColumn(aName, aCaption, aReferenceName: string;
-      aSize: integer): TTable;
-    constructor Create(aCaption, aName: string);
-  end;
+    Sort: boolean;
+    Function AddColumn(aName, aCaption, aReferenceName: String;
+      aSize: Integer): TTable;
+    Constructor Create(aCaption, aName: String);
+  End;
 
-  //TTableClass = class of TTable;
-  TTables = array of TTable;
+  TTables = Array Of TTable;
 
-  TListOfTables = class
+  TListOfTables = Class
     TableInfos: TTables;
-    constructor Create();
-    function Add(aCaption, aName: string): TTable;
-  end;
+    Constructor Create();
+    Function Add(aCaption, aName: String): TTable;
+  End;
 
-implementation
+Implementation
 
 { TColumn }
 
-function TColumn.IsReference: boolean;
+Function TColumn.IsReference: Boolean;
 begin
   Result := ReferenceName <> '';
 end;
 
-function TTable.AddColumn(aName, aCaption, aReferenceName: string;
-  aSize: integer): TTable;
+Function TTable.AddColumn(aName, aCaption, aReferenceName: String;
+  aSize: Integer): TTable;
 begin
   SetLength(ColumnInfos, length(ColumnInfos) + 1);
-  with ColumnInfos[High(ColumnInfos)] do
-  begin
+  With ColumnInfos[High(ColumnInfos)] Do
+  Begin
     Name := aName;
     Caption := aCaption;
-    if aReferenceName <> '' then
-    begin
+    If aReferenceName <> '' Then
+    Begin
       ReferenceName := aReferenceName;
       ReferenceTable := Copy(aName, 1, Length(aName) - 3) + 's';
-    end;
+    End;
     Size := aSize;
-  end;
+  End;
   Result := self;
 end;
 
-constructor TTable.Create(aCaption, aName: string);
+Constructor TTable.Create(aCaption, aName: String);
 begin
   TCaption := aCaption;
   TName := aName;
 end;
 
-function TListOfTables.Add(aCaption, aName: string): TTable;
+Function TListOfTables.Add(aCaption, aName: String): TTable;
 begin
   Result := TTable.Create(aCaption, aName);
   SetLength(TableInfos, Length(TableInfos) + 1);
@@ -84,7 +84,7 @@ begin
 end;
 
 
-constructor TListOfTables.Create();
+Constructor TListOfTables.Create();
 begin
   Add('Предметы', 'Subjects').
     AddColumn('Name', 'Название предмета', '', 400);
