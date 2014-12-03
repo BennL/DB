@@ -1,0 +1,49 @@
+object MainForm: TMainForm
+  Left = 509
+  Height = 84
+  Top = 277
+  Width = 236
+  Caption = 'MainForm'
+  Color = 16775156
+  Menu = MainMenu
+  OnCreate = FormCreate
+  LCLVersion = '1.2.0.3'
+  object IBConnection: TIBConnection
+    Connected = True
+    LoginPrompt = False
+    DatabaseName = 'D:\SCHEDULE.FDB'
+    KeepConnection = False
+    Password = 'masterkey'
+    Transaction = SQLTransaction
+    UserName = 'sysdba'
+    HostName = 'localhost'
+    LogEvents = []
+    left = 88
+    top = 8
+  end
+  object SQLTransaction: TSQLTransaction
+    Active = False
+    Action = caNone
+    Database = IBConnection
+    left = 168
+    top = 8
+  end
+  object MainMenu: TMainMenu
+    left = 16
+    top = 8
+    object FileMenu: TMenuItem
+      Caption = 'File '
+      object mExit: TMenuItem
+        Caption = 'Exit'
+        OnClick = mExitClick
+      end
+    end
+    object About: TMenuItem
+      Caption = 'About'
+      OnClick = AboutClick
+    end
+    object TablesMenu: TMenuItem
+      Caption = 'Tables'
+    end
+  end
+end
