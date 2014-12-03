@@ -1,0 +1,8 @@
+object EditForm: TEditForm
+  Left = 268
+  Height = 298
+  Top = 352
+  Width = 241
+  Caption = 'Редактирование'
+  LCLVersion = '1.0.14.0'
+end
