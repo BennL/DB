@@ -5,8 +5,11 @@ unit ueditform;
 interface
 
 uses
-  Classes, SysUtils, sqldb, FileUtil, DBGrids, Forms, Controls, Graphics, Dialogs,
+  Classes, SysUtils, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs,
   ExtCtrls, DBCtrls, metadata, querycreate, Uedit, Buttons, DBComponentCreate;
+
+const
+  Size = 60;
 
 type
 
@@ -33,6 +36,18 @@ type
     procedure BtnsCreate;
   end;
 
+  TList = array of TEditForm;
+
+  { TListOfEditForm }
+
+  TListOfEditForm = class
+    EditForms: array of TList;
+    constructor Create;
+    function HashFunction(element: integer): integer;
+    procedure InsertForm(var a: TList; element: TEditForm);
+    procedure DeleteForm(var a: TList; element: TEditForm);
+  end;
+
 var
   EditForm: TEditForm;
 
@@ -40,6 +55,60 @@ implementation
 
 uses
   main;
+
+{ TListOfEditForm }
+
+constructor TListOfEditForm.Create;
+begin
+  SetLength(EditForms, Size);
+end;
+
+function TListOfEditForm.HashFunction(element: integer): integer;
+begin
+  Result := element mod Size;
+end;
+
+procedure TListOfEditForm.InsertForm(var a: TList; element: TEditForm);
+var
+  Count, i: integer;
+begin
+  Count := -1;
+
+  for i := 0 to length(a) - 1 do
+    if a[i].ID = element.ID then
+      Count := i;
+
+  if Count = -1 then
+  begin
+    SetLength(a, length(a) + 1);
+    a[high(a)] := element;
+  end
+  else
+  begin
+    a[count].Free;
+    a[count] := element;
+  end;
+end;
+
+procedure TListOfEditForm.DeleteForm(var a: TList; element: TEditForm);
+var
+  i, Count, index: integer;
+begin
+  for i := 0 to high(a) do
+    if a[i] = element then
+    begin
+      Inc(Count);
+      index := i;
+      break;
+    end;
+
+  if Count = 0 then
+    exit
+  else
+    for i := index to high(a) - 1 do
+      a[i] := a[i + 1];
+  SetLength(a, length(a) - 1);
+end;
 
 {$R *.lfm}
 
@@ -57,15 +126,17 @@ begin
   ListOfEditors := TDBEditors.Create;
   ID := aID;
 
-  if ID = 0 then
+  if ID = 0 then begin
     IsInsert := True;
+    Self.Caption:= 'Вставка';
+  end;
 
   MSQLQuery := SQLQueryCreate;
   SetQuery(MSQLQuery, CreateQuery(ETable) + GetQueryRowByID(ETable, ID));
 
   for i := 0 to high(ETable.ColumnInfos) do
   begin
-    if ETable.ColumnInfos[i].VisableColumn then
+    if ETable.ColumnInfos[i].VisibleColumn then
     begin
       ListOfEditors.AddEditor(Self, ID, ETable);
     end;

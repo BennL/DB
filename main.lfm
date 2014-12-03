@@ -1,14 +1,14 @@
 object MainForm: TMainForm
-  Left = 678
-  Height = 327
-  Top = 213
-  Width = 452
+  Left = -8
+  Height = 306
+  Top = 212
+  Width = 433
   Caption = 'MainForm'
-  ClientHeight = 307
-  ClientWidth = 452
+  ClientHeight = 286
+  ClientWidth = 433
   Menu = MainMenu
   OnCreate = FormCreate
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '1.2.6.0'
   object FileSelectButton: TButton
     Left = 32
     Height = 23
@@ -27,10 +27,13 @@ object MainForm: TMainForm
     TabOrder = 1
   end
   object Image: TImage
-    Left = -8
-    Height = 342
-    Top = -33
-    Width = 569
+    Left = 0
+    Height = 326
+    Top = -24
+    Width = 529
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    AutoSize = True
+    Center = True
     Picture.Data = {
       0A544A706567496D6167653FE70000FFD8FFE000104A46494600010101004800
       480000FFE117A04578696600004D4D002A00000008000F010E00020000003B00
@@ -1884,6 +1887,17 @@ object MainForm: TMainForm
       73BFEE2F7E28A29B96A1CBD0AFA4DED8DBEA1BEEED3ED51FF719F6D547B9B74B
       EDDB372FF768A2A798AE5D4FFFD9
     }
+    Stretch = True
+  end
+  object OpenSchedule: TBitBtn
+    Left = 14
+    Height = 40
+    Top = 175
+    Width = 168
+    Anchors = [akRight]
+    Caption = 'Открыть расписание'
+    OnClick = OpenScheduleClick
+    TabOrder = 2
   end
   object MainMenu: TMainMenu
     left = 136
@@ -1906,11 +1920,13 @@ object MainForm: TMainForm
   object IBConnection: TIBConnection
     Connected = False
     LoginPrompt = False
+    DatabaseName = 'D:\SCHEDULE(1).FDB'
     KeepConnection = False
     Password = 'masterkey'
     Transaction = SQLTransaction
     UserName = 'sysdba'
     CharSet = 'UTF-8'
+    HostName = 'localhost'
     LogEvents = []
     left = 104
     top = 376
@@ -1923,9 +1939,9 @@ object MainForm: TMainForm
     top = 376
   end
   object OpenDialog: TOpenDialog
-    FileName = 'F:\SCHEDULE.FDB'
+    FileName = 'D:\SCHEDULE(1).FDB'
     Filter = 'База данных Firebird|*.fdb; *fb|База данных Interbase|*.gdb|Все|*.*'
-    InitialDir = 'C:\'
+    InitialDir = 'D:\'
     left = 64
     top = 376
   end

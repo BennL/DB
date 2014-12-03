@@ -17,7 +17,7 @@ type
     ResetFilterBitBtn: TBitBtn;
     Datasource: TDatasource;
     DBGrid: TDBGrid;
-    InsertBitBtn: tbitbtn;
+    InsertBitBtn: TBitBtn;
     SQLQuery: TSQLQuery;
     AddFilterBitBtn: TBitBtn;
     procedure AddFilterBitBtnClick(Sender: TObject);
@@ -38,6 +38,7 @@ type
 
 var
   TableForm: TTableForm;
+  ListOfEditForm: TListOfEditForm;
 
 implementation
 
@@ -74,15 +75,31 @@ begin
   ShowTable(SQLQuery, DBGrid, MTable);
 end;
 
-procedure TTableForm.OnFilterFormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
+procedure TTableForm.OnFilterFormClose(Sender: TObject; var CloseAction: TCloseAction);
 begin
   AddFilterBitBtn.Enabled := True;
 end;
 
-procedure TTableForm.OnEditFormClose(Sender: TObject;
-  var CloseAction: TCloseAction);
+procedure TTableForm.OnEditFormClose(Sender: TObject; var CloseAction: TCloseAction);
+var
+  i: integer;
+  CurrID: integer;
+  HashResult: integer;
 begin
+  InsertBitBtn.Enabled := true;
+  CurrID := TEditForm(Sender).ID;
+  
+  if CurrID <> 0 then 
+  begin
+
+   with ListOfEditForm do
+   begin
+     HashResult := HashFunction(CurrID);
+     DeleteForm(EditForms[HashResult],
+       EditForms[HashResult][high(EditForms[HashResult])]);
+   end;
+  end;
+
   CloseAction := caFree;
   ShowTable(SQLQuery, DBGrid, MTable);
 end;
@@ -117,12 +134,21 @@ end;
 procedure TTableForm.DBGridDblClick(Sender: TObject);
 var
   NewForm: TEditForm;
+  HashResult: integer;
+  CurrID: integer;
 begin
-  NewForm := TEditForm.Create(Self, MTable, SQLQuery.Fields[0].AsInteger);
-  with NewForm do
+  CurrID := SQLQuery.Fields[0].AsInteger;
+  NewForm := TEditForm.Create(Self, MTable, CurrID);
+  with ListOfEditForm do
   begin
-    OnClose := @OnEditFormClose;
-    Show;
+    HashResult := HashFunction(CurrID);
+    InsertForm(EditForms[HashResult], NewForm);
+
+    with EditForms[HashResult][high(EditForms[HashResult])] do
+    begin
+      OnClose := @OnEditFormClose;
+      Show;
+    end;
   end;
 end;
 
@@ -137,6 +163,7 @@ procedure TTableForm.InsertBitBtnClick(Sender: TObject);
 var
   NewForm: TEditForm;
 begin
+  TBitBtn(Sender).Enabled := false;
   NewForm := TEditForm.Create(Self, MTable, 0);
   with NewForm do
   begin
@@ -149,8 +176,10 @@ constructor TTableForm.Create(aOwner: TControl; aTable: TTableInfo);
 begin
   inherited Create(aOwner);
   MTable := aTable;
+  ListOfEditForm := TListOfEditForm.Create;
 end;
 
 end.
+
 
 

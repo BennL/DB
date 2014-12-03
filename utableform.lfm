@@ -1,13 +1,13 @@
 object TableForm: TTableForm
-  Left = 745
+  Left = 299
   Height = 414
-  Top = 277
+  Top = 210
   Width = 810
   Caption = 'TableForm'
   ClientHeight = 414
   ClientWidth = 810
   OnClose = FormClose
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '1.2.6.0'
   object DBGrid: TDBGrid
     Left = 0
     Height = 354
@@ -250,7 +250,7 @@ object TableForm: TTableForm
     left = 696
     top = 8
   end
-  object Datasource: TDatasource
+  object Datasource: TDataSource
     DataSet = SQLQuery
     left = 728
     top = 8

@@ -1,11 +1,11 @@
 object EditForm: TEditForm
-  Left = 258
+  Left = 152
   Height = 0
-  Top = 157
+  Top = 259
   Width = 253
   BorderStyle = bsSingle
   Caption = 'Редактирование'
-  LCLVersion = '1.0.14.0'
+  LCLVersion = '1.2.6.0'
   object ImageList: TImageList
     left = 8
     top = 7

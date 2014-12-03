@@ -217,7 +217,7 @@ begin
     Height := FilterComponentHeight;
     Width := FilterComponentWidth;
     for i := 0 to high(FTable.ColumnInfos) do
-      if (FTable.ColumnInfos[i].VisableColumn = True) then
+      if (FTable.ColumnInfos[i].VisibleColumn = True) then
         Items.Add(FTable.ColumnInfos[i].Caption);
   end;
 

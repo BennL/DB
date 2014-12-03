@@ -96,7 +96,6 @@ begin
     SQL.Text := aQuery;
     for i := 0 to high(aParam) do
     begin
-      //ShowMessage(aParam[i]);
       ParamByName('p' + IntToStr(i)).AsString := aParam[i];
     end;
     ExecSQL;
@@ -138,8 +137,6 @@ begin
       end;
     end;
   end;
-
-  // ShowMessage (Result);
 end;
 
 procedure SetCaption(aDBGrid: TDBGrid; aTable: TTableInfo);
@@ -151,7 +148,7 @@ begin
     aDBGrid.Columns[i].Width := aTable.ColumnInfos[i].Size;
     aDBGrid.Columns[i].Title.Caption := aTable.ColumnInfos[i].Caption;
     aDBGrid.Columns[i].ReadOnly := True;
-    if (aTable.ColumnInfos[i].VisableColumn = False) then
+    if (aTable.ColumnInfos[i].VisibleColumn = False) then
       aDBGrid.Columns[i].Visible := False;
   end;
 end;
@@ -176,7 +173,6 @@ begin
     Result += ' from ' + Name;
   end;
 end;
-
 
 
 end.

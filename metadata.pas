@@ -7,8 +7,6 @@ interface
 uses
   Classes, SysUtils, DB, sqldb, FileUtil, Forms, Controls, Graphics, Dialogs;
 
-const
-  NOT_STRING_VALUE = '';
 
 type
 
@@ -20,7 +18,7 @@ type
     Size: integer;
     FieldType: TFieldType;
     Reference: boolean;
-    VisableColumn: boolean;
+    VisibleColumn: boolean;
     ReferenceColumn: string;
     ReferenceTable: string;
     AliasName: string;
@@ -37,7 +35,7 @@ type
     constructor Create(aCaption, aName: string);
     function AddColumn(aCaption, aName: string; aFieldType: TFieldType;
       aSize: integer; aReference: boolean; aVisible: boolean;
-      aReferenceColumn, aReferenceTable: string; aParentTable: string): TTableInfo;
+      aReferenceColumn, aReferenceTable: string): TTableInfo;
   end;
 
   { TListOfTable }
@@ -81,75 +79,75 @@ begin
 
   AddTable('Преподаватели', 'Professors').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Professors').
+      False, False, '', '').
     AddColumn('Преподаватель', 'Name', ftString, 110,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Professors');
+      False, True, '', '');
 
   AddTable('Предметы', 'Subjects').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Subjects').
+      False, False, '', '').
     AddColumn('Предмет', 'Name', ftString, 385,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Subjects');
+      False, True, '', '');
 
   AddTable('Кабинеты', 'Rooms').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Rooms').
+      False, False, '', '').
     AddColumn('Кабинет', 'Name', ftString, 100,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Rooms').
+      False, True, '', '').
     AddColumn('Вместимость', 'Room_size', ftInteger, 80,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Rooms');
+      False, True, '', '');
 
   AddTable('Группы', 'Groups').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Groups').
+      False, False, '', '').
     AddColumn('Группа', 'Name', ftString, 70,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Groups').
+      False, True, '', '').
     AddColumn('Количество человек', 'Group_size', ftInteger, 30,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Groups');
+      False, True, '', '');
 
   AddTable('Дни недели', 'Days').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Days').
+      False, False, '', '').
     AddColumn('Название', 'Name', ftString, 100,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Days');
+      False, True, '', '');
 
   AddTable('Типы занятий', 'Subject_Types').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Subject_Types').
+      False, False, '', '').
     AddColumn('Название', 'Name', ftString, 30,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Subject_Types');
+      False, True, '', '');
 
   AddTable('Неделя', 'Weeks').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Weeks').
+      False, False, '', '').
     AddColumn('Тип недели', 'Name', ftString, 100,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Weeks');
+      False, True, '', '');
 
   AddTable('Расписание звонков', 'Times').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Times').
+      False, False, '', '').
     AddColumn('Время', 'Begin_End_Time', ftString, 100,
-      False, True, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Times');
+      False, True, '', '');
 
   AddTable('Расписание', 'Schedule_items').
     AddColumn('ID', 'ID', ftInteger, 10,
-      False, False, NOT_STRING_VALUE, NOT_STRING_VALUE, 'Schedule_items').
+      False, False, '', '').
     AddColumn('Предмет', 'Subject_id', ftString, 385,
-      True, True, 'Name', 'Subjects', 'Schedule_items').
+      True, True, 'Name', 'Subjects').
     AddColumn('Тип', 'Subject_type_id', ftString, 30,
-      True, True, 'Name', 'Subject_types', 'Schedule_items').
+      True, True, 'Name', 'Subject_types').
     AddColumn('Преподаватель', 'Professor_id', ftString, 110,
-      True, True, 'Name', 'Professors', 'Schedule_items').
+      True, True, 'Name', 'Professors').
     AddColumn('Время', 'Time_id', ftString, 90,
-      True, True, 'Begin_End_Time', 'Times', 'Schedule_items').
+      True, True, 'Begin_End_Time', 'Times').
     AddColumn('День недели', 'Day_id', ftDate, 90,
-      True, True, 'Name', 'Days', 'Schedule_items').
+      True, True, 'Name', 'Days').
     AddColumn('Группа', 'Group_id', ftString, 70,
-      True, True, 'Name', 'Groups', 'Schedule_items').
+      True, True, 'Name', 'Groups').
     AddColumn('Кабинет', 'Room_id', ftString, 55,
-      True, True, 'Name', 'Rooms', 'Schedule_items').
+      True, True, 'Name', 'Rooms').
     AddColumn('Неделя', 'Week_id', ftString, 90,
-      True, True, 'Name', 'Weeks', 'Schedule_items');
+      True, True, 'Name', 'Weeks');
 
 end;
 
@@ -180,7 +178,7 @@ end;
 
 function TTableInfo.AddColumn(aCaption, aName: string; aFieldType: TFieldType;
   aSize: integer; aReference: boolean; aVisible: boolean; aReferenceColumn,
-  aReferenceTable: string; aParentTable: string): TTableInfo;
+  aReferenceTable: string): TTableInfo;
 begin
   SetLength(ColumnInfos, length(ColumnInfos) + 1);
   with ColumnInfos[high(ColumnInfos)] do
@@ -188,9 +186,8 @@ begin
     Name := aName;
     Caption := aCaption;
     Reference := aReference;
-    VisableColumn := aVisible;
-    ParentTable := aParentTable;
-
+    VisibleColumn := aVisible;
+    ParentTable := Self.Name;
 
     if (Reference) then
     begin
