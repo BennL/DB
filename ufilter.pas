@@ -57,8 +57,11 @@ type
     procedure Clear();
     function CreateFQuery: string;
     function Count(): Integer;
+    function CheckPopulateFields: Boolean;
   end;
 
+var
+  ListOfFilters: TListOfFilters;
 
 implementation
 
@@ -145,6 +148,22 @@ end;
 function TListOfFilters.Count: Integer;
 begin
   Result := Length(Filters);
+end;
+
+function TListOfFilters.CheckPopulateFields: Boolean;
+var
+  i: integer;
+begin
+  for i := 0 to high (Filters) do begin
+   Result := true;
+     if ((Filters[i].FComboBoxColumn.Caption = '') or
+       (Filters[i].FComboBoxCondition.Caption = '') or
+       (Filters[i].FEdit.Caption = '')) then begin
+         ShowMessage ('Заполните все поля');
+         Result := false;
+         break;
+       end;
+   end;
 end;
 
 { TFilter }

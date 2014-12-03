@@ -6,29 +6,25 @@ interface
 
 uses
   Classes, SysUtils, sqldb, db, FileUtil, Forms, Controls, Graphics, Dialogs,
-  DBGrids, ExtCtrls, Buttons, StdCtrls, metadata, ufilter, querycreate,
-  ueditform;
+  DBGrids, ExtCtrls, Buttons, StdCtrls, metadata, UFilterForm, querycreate,
+  ueditform, ufilter;
 
 type
 
   { TTableForm }
 
   TTableForm = class(TForm)
-    ResetBitBtn: TBitBtn;
-    DestroyBitBtn: TBitBtn;
-    UpdateBitBtn: TBitBtn;
-    FilterBitBtn: TBitBtn;
+    ResetFilterBitBtn: TBitBtn;
     Datasource: TDatasource;
     DBGrid: TDBGrid;
-    FilterScrollBox: TScrollBox;
     SQLQuery: TSQLQuery;
+    AddFilterBitBtn: TBitBtn;
+    procedure AddFilterBitBtnClick(Sender: TObject);
     procedure DBGridTitleClick(Column: TColumn);
-    procedure DestroyBitBtnClick(Sender: TObject);
-    procedure FilterBitBtnClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
-    procedure ResetBitBtnClick(Sender: TObject);
-    procedure UpdateBitBtnClick(Sender: TObject);
-    function CheckPopulateFields: Boolean;
+    procedure OKBtnClick(Sender: TObject);
+    procedure ResetFilterBitBtnClick(Sender: TObject);
+    procedure OnFilterFormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
     Order: Boolean;
   public
@@ -38,7 +34,6 @@ type
 
 var
   TableForm: TTableForm;
-  ListOfFilters: TListOfFilters;
 
 implementation
 
@@ -46,24 +41,17 @@ implementation
 
 { TTableForm }
 
-procedure TTableForm.ResetBitBtnClick(Sender: TObject);
-begin
-  if (length (ListOfFilters.Filters) <> 0) then ListOfFilters.Destroy;
-  ShowTable (SQLQuery, DBGrid, MTable);
-end;
-
-procedure TTableForm.UpdateBitBtnClick(Sender: TObject);
+procedure TTableForm.OKBtnClick(Sender: TObject);
 var
   i: integer;
   Param: array of string;
 begin
   with ListOfFilters do begin
-    if (length (Filters) <> 0) then
-      if (CheckPopulateFields) then begin
+    if (length (Filters) <> 0) and (CheckPopulateFields) then begin
         for i := 0 to high (Filters) do begin
           with (Filters[i]) do begin
             SetLength (Param, length (Param) + 1);
-            Param[i] := Format (FCondition.Conditions[FComboBoxCondition.ItemIndex].ParamFormat,
+            Param[i] := Format(FCondition.Conditions[FComboBoxCondition.ItemIndex].ParamFormat,
             [FEdit.Caption]);
           end;
         end;
@@ -72,24 +60,14 @@ begin
   end;
 end;
 
-function TTableForm.CheckPopulateFields: Boolean;
-var
-  i: integer;
+procedure TTableForm.ResetFilterBitBtnClick(Sender: TObject);
 begin
-  with ListOfFilters do begin
-    for i := 0 to high (Filters) do begin
-      Result := true;
+  ShowTable(SQLQuery, DBGrid, MTable);
+end;
 
-      if ((Filters[i].FComboBoxColumn.Caption = '') or
-        (Filters[i].FComboBoxCondition.Caption = '') or
-        (Filters[i].FEdit.Caption = '')) then begin
-          ShowMessage ('Заполните все поля');
-          Result := false;
-          break;
-        end;
-
-    end;
-  end;
+procedure TTableForm.OnFilterFormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  AddFilterBitBtn.Enabled := true;
 end;
 
 procedure TTableForm.DBGridTitleClick(Column: TColumn);
@@ -104,29 +82,18 @@ begin
   ShowSortTable (SQLQuery, DBGrid, MTable, Query, Column.Index, Order);
 end;
 
-procedure TTableForm.DestroyBitBtnClick(Sender: TObject);
+procedure TTableForm.AddFilterBitBtnClick(Sender: TObject);
 var
-  i: integer;
-  flag: Boolean;
+  NewForm: TFilterForm;
 begin
-  if ListOfFilters.Count <> 0 then begin
-    flag := false;
-    while (not flag) do begin
-      flag := true;
-      for i := 0 to high (ListOfFilters.Filters) do begin
-        if (ListOfFilters.Filters[i].FDestroyCheckBox.Checked) then begin
-          ListOfFilters.DeleteFilter (i);
-          flag := false;
-          break;
-        end;
-      end;
-    end;
+  TButton(Sender).Enabled := false;
+  NewForm := TFilterForm.Create(Self);
+  with NewForm do begin
+    FilterTable := MTable;
+    OKBitBtn.OnClick := @OKBtnClick;
+    OnClose := @OnFilterFormClose;
+    Show;
   end;
-end;
-
-procedure TTableForm.FilterBitBtnClick(Sender: TObject);
-begin
-  ListOfFilters.AddFilter (FilterScrollBox, MTable);
 end;
 
 procedure TTableForm.FormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -139,7 +106,6 @@ constructor TTableForm.Create(aOwner: TControl; aTable: TTableInfo);
 begin
   inherited Create(aOwner);
   MTable := aTable;
-  ListOfFilters := TListOfFilters.Create;
 end;
 
 end.
