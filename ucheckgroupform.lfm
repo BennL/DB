@@ -1,7 +1,7 @@
 object CheckGroupForm: TCheckGroupForm
-  Left = 513
+  Left = 823
   Height = 196
-  Top = 204
+  Top = 186
   Width = 185
   Caption = 'Колонки'
   ClientHeight = 196

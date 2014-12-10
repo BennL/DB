@@ -16,6 +16,8 @@ type
   { TEditForm }
 
   TEditForm = class(TForm)
+    DragAndDrop: TBitBtn;
+    DragBtn: TBitBtn;
     ImageList: TImageList;
     OKBtn: TBitBtn;
     CancelBtn: TBitBtn;
@@ -31,6 +33,7 @@ type
     ETable: TTableInfo;
     MSQLQuery: TSQLQuery;
     IsInsert: boolean;
+    CurrCB, CurrCol: TPoint;
     MTransaction: TSQLTransaction;
     constructor Create(TheOwner: TComponent; aTable: TTableInfo; aID: integer;
       aCurrCB, aCurrCol: TPoint);
@@ -126,6 +129,10 @@ begin
   ETable := aTable;
   ListOfEditors := TDBEditors.Create;
   ID := aID;
+
+  CurrCB:= aCurrCB;
+  CurrCol:= aCurrCol;
+
 
   if ID = 0 then begin
     IsInsert := True;

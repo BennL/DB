@@ -154,7 +154,6 @@ begin
     LookUpQuery.First;
     while (not LookUpQuery.EOF) do
     begin
-      //ShowMessage (EDBSQLQuery.SQL.Text);
       Items.Add(LookUpQuery.Fields[1].AsString);
       SetLength(IDs, Length(IDs) + 1);
       IDs[High(IDs)] := LookUpQuery.FieldByName('ID').AsInteger;
@@ -240,7 +239,7 @@ begin
     begin
       if (EColumn.Reference) then
         Result += Format(' %s = %s',
-          [EColumn.Name, QuotedStr(IntToStr(IDs[EDBComBo.ItemIndex]))])
+          [EColumn.Name, IntToStr(IDs[EDBComBo.ItemIndex])])
 
 
       else

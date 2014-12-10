@@ -22,6 +22,7 @@ type
 
   TItems = record
     ID: integer;
+    Ids: array of integer;
     Item: array of string;
   end;
 
@@ -47,6 +48,11 @@ type
     DataSource: TDataSource;
     procedure AddFiltersClick(Sender: TObject);
     procedure CheckGroupItemClick(Sender: TObject; Index: integer);
+    procedure DrawGridDragDrop(Sender, Source: TObject; X, Y: integer);
+    procedure DrawGridDragOver(Sender, Source: TObject; X, Y: integer;
+      State: TDragState; var Accept: boolean);
+    procedure DrawGridEndDrag(Sender, Target: TObject; X, Y: integer);
+    procedure DrawGridStartDrag(Sender: TObject; var DragObject: TDragObject);
     procedure ExportBitBtnClick(Sender: TObject);
     procedure OnCheckGroupFormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure CheckColBitBtnClick(Sender: TObject);
@@ -63,7 +69,6 @@ type
     procedure EditFormClose(Sender: TObject; var CloseAction: TCloseAction);
   private
     CurrentHeight: integer;
-    IsReset: boolean;
     XTitles: array of TColumnRowName;
     YTitles: array of TColumnRowName;
     FCols: array of TColumnInfo;
@@ -74,6 +79,9 @@ type
     CurCol: integer;
     CurRow: integer;
     CurRecord: integer;
+    CurrientPos: integer;
+    TempCol: integer;
+    TempRow: integer;
     procedure RefreshInfo;
     procedure FillRowTitles;
     procedure FillColumnTitles;
@@ -84,21 +92,50 @@ type
     procedure OKBtnClick(Sender: TObject);
     procedure OnFilterFormClose(Sender: TObject; var CloseAction: TCloseAction);
     function CreateScheduleQuery: string;
+    function InsertQuery(cCol, cRow: integer): string;
+    function UpdateQuery(cCol, cRow: integer): string;
+    function DeleteQuery: string;
     function GetLookUpResult(aTable: TTableInfo): TColumnRowNames;
   public
     VisibleColumn: array of boolean;
+  end;
+
+  { TDragDimension }
+
+  TDragDimension = class(TDragControlObject)
+  private
+    FDragCanvas: TCanvas;
+  public
+    constructor Create(AControl: TControl); override;
+    destructor Destroy; override;
   end;
 
 var
   ScheduleForm: TScheduleForm;
   ScheduleTable: TTableInfo;
   ListOfEditForm: TListOfEditForm;
+  FDragObject: TDragDimension;
 
 implementation
+
 uses
-  UExport;
+  UExport, main;
 
 {$R *.lfm}
+
+{ TTDragDimension }
+
+constructor TDragDimension.Create(AControl: TControl);
+begin
+  inherited Create(AControl);
+  FDragCanvas := TCanvas.Create;
+end;
+
+destructor TDragDimension.Destroy;
+begin
+  FDragCanvas.Free;
+  inherited Destroy;
+end;
 
 { TScheduleForm }
 
@@ -149,8 +186,10 @@ begin
 
   VisibleColumn[Index] := TCheckGroup(Sender).Checked[Index];
 
-  for i := 0 to high (VisibleColumn) do begin
-    if (VisibleColumn[i]) then inc (Count);
+  for i := 0 to high(VisibleColumn) do
+  begin
+    if (VisibleColumn[i]) then
+      Inc(Count);
   end;
 
   CurrentHeight := Count * 20;
@@ -160,6 +199,50 @@ begin
   with DrawGrid do
     for i := 1 to RowCount - 1 do
       RowHeights[i] := CurrentHeight;
+end;
+
+procedure TScheduleForm.DrawGridDragDrop(Sender, Source: TObject; X, Y: integer);
+begin
+
+end;
+
+procedure TScheduleForm.DrawGridDragOver(Sender, Source: TObject;
+  X, Y: integer; State: TDragState; var Accept: boolean);
+begin
+
+end;
+
+procedure TScheduleForm.DrawGridEndDrag(Sender, Target: TObject; X, Y: integer);
+var
+  aCol, aRow: integer;
+  Query: string;
+begin
+  DrawGrid.MouseToCell(X, Y, aCol, aRow);
+
+  if Length(Items[aRow - 1][aCol - 1]) = 0 then
+  begin
+    Query := InsertQuery(aCol, aRow);
+  end
+  else
+  begin
+    Query := UpdateQuery(aCol, aRow);
+  end;
+
+  SetScheduleQuery(SQLQuery, Query);
+  if Length(Items[aRow - 1][aCol - 1]) = 0 then
+    SetScheduleQuery(SQLQuery, DeleteQuery);
+  MainForm.SQLTransaction.Commit;
+  RefreshInfo;
+
+  //ShowMessage(IntToStr(xID));
+end;
+
+procedure TScheduleForm.DrawGridStartDrag(Sender: TObject; var DragObject: TDragObject);
+begin
+  DragObject := FDragObject;
+
+  TempCol := CurCol - 1;
+  TempRow := CurRow - 1;
 end;
 
 procedure TScheduleForm.ExportBitBtnClick(Sender: TObject);
@@ -191,9 +274,25 @@ end;
 
 procedure TScheduleForm.DrawGridMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: integer);
+var
+  TCol, TRow: integer;
 begin
   CurrentPoint.X := X;
   CurrentPoint.Y := Y;
+  CurrientPos := (Y - DrawGrid.CellRect(CurCol, CurRow).Top) div CurrentHeight;
+
+  with DrawGrid do
+  begin
+    if ssCtrl in Shift then
+    begin
+      MouseToCell(X, Y, TCol, TRow);
+      Tag := 1;
+      if (TCol > 0) or (TRow > 0) then
+        BeginDrag(True)
+      else
+        Tag := 0;
+    end;
+  end;
 end;
 
 procedure TScheduleForm.DrawGridMouseMove(Sender: TObject; Shift: TShiftState;
@@ -250,7 +349,8 @@ begin
         if (aRow = CurRow) and (aCol = CurCol) and (i = CurRecord) then
           with aRect do
           begin
-            GridEditBtn := Rect (Right - 10, Top + CurrHeight - 160, Right, Top + CurrHeight - 120);
+            GridEditBtn := Rect(Right - 10, Top + CurrHeight - 160,
+              Right, Top + CurrHeight - 120);
             InterfaceImage.Draw(DrawGrid.Canvas, Right - 16, Top +
               CurrHeight - 160, 2, True);
           end;
@@ -260,12 +360,12 @@ begin
         CurrHeight += 5;
       end;
 
-     if (CurRow = aRow) and (CurCol = aCol) and (aCol > 0) and (aRow > 0) then
-          with aRect do
-          begin
-            GridInsertBtn := Rect (Left, Bottom - 10, Left + 10, Bottom);
-            InterfaceImage.Draw(DrawGrid.Canvas, Left, Bottom  - 16, 1, True);
-          end;
+    if (CurRow = aRow) and (CurCol = aCol) and (aCol > 0) and (aRow > 0) then
+      with aRect do
+      begin
+        GridInsertBtn := Rect(Left, Bottom - 16, Left + 16, Bottom);
+        InterfaceImage.Draw(DrawGrid.Canvas, Left, Bottom - 16, 1, True);
+      end;
 
     Brush.Color := clBlack;
     Brush.Style := bsSolid;
@@ -278,17 +378,21 @@ begin
 end;
 
 procedure TScheduleForm.ResetBtnClick(Sender: TObject);
+var
+  buttonSelected: integer;
 begin
-  RefreshInfo;
+  buttonSelected := 0;
+
+  if XComboBox.ItemIndex = YComboBox.ItemIndex then
+    buttonSelected := MessageDlg('Выбраны недопустимые значения X и Y', mtError, [mbOK], 0);
+  if buttonSelected = 0 then
+    RefreshInfo;
 end;
 
 procedure TScheduleForm.ResetFiltersClick(Sender: TObject);
 begin
   ListOfFilters.Clear();
-
-  IsReset := True;
   RefreshInfo;
-  IsReset := False;
 end;
 
 procedure TScheduleForm.EditFormClose(Sender: TObject; var CloseAction: TCloseAction);
@@ -354,7 +458,7 @@ end;
 
 procedure TScheduleForm.SetColsRows;
 var
-  i: Integer;
+  i: integer;
 begin
   with DrawGrid do
   begin
@@ -375,9 +479,8 @@ var
   i, j, k: integer;
   YFieldID, XFieldID, ColumnCount: integer;
   XIDCol, YIDCol: TColumnInfo;
-  Query: string;
+  aQuery: string;
   Param: array of string;
-  f: Text;
 begin
   Items := nil;
 
@@ -386,31 +489,31 @@ begin
   XIDCol := FCols[XComboBox.ItemIndex];
   YIDCol := FCols[YComboBox.ItemIndex];
 
-  Query += CreateScheduleQuery;
+  aQuery += CreateScheduleQuery;
 
   with ListOfFilters do
   begin
-    if (length(Filters) <> 0) and (CheckPopulateFields) and (not IsReset) then
+    if (length(Filters) <> 0) and (CheckPopulateFields) {and (not IsReset)} then
     begin
       for i := 0 to high(Filters) do
       begin
-        with (Filters[i]) do
+        with Filters[i] do
         begin
           SetLength(Param, length(Param) + 1);
           Param[i] := Format(FCondition.Conditions[
             FComboBoxCondition.ItemIndex].ParamFormat, [FEdit.Caption]);
         end;
       end;
-      Query += ' ' + CreateFQuery;
+      aQuery += ' ' + CreateFQuery;
     end
     else
       SetLength(Param, 0);
   end;
 
-  Query += ' order by ' + FCols[YComboBox.ItemIndex].ReferenceTable +
+  aQuery += ' order by ' + FCols[YComboBox.ItemIndex].ReferenceTable +
     '.ID' + ', ' + FCols[XComboBox.ItemIndex].ReferenceTable + '.ID' + ', Times.ID';
 
-  SetParamQuery(SQLQuery, Query, Param);
+  SetParamQuery(SQLQuery, aQuery, Param);
 
   XFieldID := SQLQuery.FieldByName(XIDCol.AliasName).Index;
   YFieldID := SQLQuery.FieldByName(YIDCol.AliasName).Index;
@@ -436,12 +539,19 @@ begin
 
       SetLength(Items[i][j], length(Items[i][j]) + 1);
       SetLength(Items[i][j][high(Items[i][j])].Item, ColumnCount);
+      SetLength(Items[i][j][high(ITems[i][j])].Ids, ColumnCount);
 
 
-      for k := 0 to high(FCols) do
+      for k := 0 to ColumnCount - 1 do
+      begin
         Items[i][j][high(Items[i][j])].Item[k] :=
           FieldByName(GetTableByName(FCols[k].ReferenceTable).ColumnInfos
           [1].AliasName).AsString;
+        Items[i][j][high(Items[i][j])].Ids[k] :=
+          FieldByName(ScheduleTable.Name + FCols[k].Name).AsInteger;
+        //ShowMessage (IntToStr(Items[i][j][high(Items[i][j])].Ids[k]));
+        //ShowMessage(Items[i][j][high(Items[i][j])].Item[k]);
+      end;
 
       Items[i][j][high(Items[i][j])].ID := FieldByName('Schedule_itemsID').AsInteger;
       Next;
@@ -451,8 +561,6 @@ end;
 
 procedure TScheduleForm.ButtonClick(aRect: TRect; IsInsert: boolean);
 var
-  i: integer;
-  HashResult: integer;
   NewForm: TEditForm;
   CurrCB, CurrCol: TPoint;
 begin
@@ -461,9 +569,9 @@ begin
   CurrCol.X := DrawGrid.Col - 1;
   CurrCol.Y := DrawGrid.Row - 1;
 
-  with (aRect) do
+  with aRect do
   begin
-    with (CurrentPoint) do
+    with CurrentPoint do
     begin
       if (Left < X) and (Right > X) and (Top < Y) and (Bottom > Y) then
       begin
@@ -505,7 +613,7 @@ begin
 
   Result += 'Select';
 
-  with (ScheduleTable) do
+  with ScheduleTable do
   begin
     for i := 0 to high(ColumnInfos) do
       Result += Format(' %s.%s as %s,', [Name, ColumnInfos[i].Name,
@@ -515,7 +623,7 @@ begin
       if (ColumnInfos[i].Reference) then
       begin
         Table := GetTableByName(ColumnInfos[i].ReferenceTable);
-        with (Table) do
+        with Table do
         begin
           for j := 0 to high(ColumnInfos) do
           begin
@@ -537,12 +645,92 @@ begin
 
     for i := 0 to high(ColumnInfos) do
     begin
-      with (ColumnInfos[i]) do
-        if (VisibleColumn) then
+      with ColumnInfos[i] do
+        if VisibleColumn then
           Result += Format('inner join %s on %s.%s = %s.ID ',
             [ReferenceTable, ScheduleTable.Name, Name, ReferenceTable]);
     end;
   end;
+end;
+
+function TScheduleForm.InsertQuery(cCol, cRow: integer): string;
+var
+  i: integer;
+  xID, yID: integer;
+begin
+  xID := XComboBox.ItemIndex;
+  yID := YComboBox.ItemIndex;
+
+  with ScheduleTable do
+  begin
+    Result := Format('Insert into %s values (next value for %s, ',
+      [Name, GenerateName]);
+
+    with Items[TempRow][TempCol][CurrientPos] do
+    begin
+      for i := 0 to high(Ids) do
+      begin
+        if (i <> xID) and (i <> yID) then
+          Result += IntToStr(Ids[i])
+        else
+        if i = xID then
+          Result += IntToStr(XTitles[cCol - 1].ID)
+        else
+        if i = yID then
+          Result += IntToStr(YTitles[cRow - 1].ID);
+
+        if (i <> high(Ids)) then
+          Result += ', '
+        else
+          Result += ')';
+      end;
+    end;
+  end;
+end;
+
+function TScheduleForm.UpdateQuery(cCol, cRow: integer): string;
+var
+  i: integer;
+  xID, yID: integer;
+begin
+  xID := XComboBox.ItemIndex;
+  yID := YComboBox.ItemIndex;
+
+  with ScheduleTable do
+  begin
+    with Items[TempRow][TempCol][CurrientPos] do
+    begin
+      Result := Format('Update %s set ', [Name]);
+      for i := 0 to high(Ids) do
+      begin
+        if (i <> xID) and (i <> yID) then
+          Result += Format(' %s = %d', [ColumnInfos[i + 1].Name, Ids[i]])
+        else
+        if i = xID then
+          Result += Format(' %s = %d', [ColumnInfos[i + 1].Name,
+            XTitles[cCol - 1].ID])
+        else
+        if i = yID then
+          Result += Format(' %s = %d', [ColumnInfos[i + 1].Name,
+            YTitles[cRow - 1].ID]);
+
+        if (i <> high(Ids)) then
+          Result += ', '
+        else
+          Result += ' ';
+      end;
+      Result += Format(' where %s.ID = %d', [Name, ID]);
+
+
+
+    end;
+  end;
+end;
+
+function TScheduleForm.DeleteQuery: string;
+begin
+  Result := Format('Delete from %s where %s.ID = %d',
+    [ScheduleTable.Name, ScheduleTable.Name, Items[TempRow][TempCol][CurrientPos].ID]);
 end;
 
 function TScheduleForm.GetLookUpResult(aTable: TTableInfo): TColumnRowNames;

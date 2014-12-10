@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="9"/>
+    <PathDelim Value="\"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <MainUnit Value="0"/>
+      <Title Value="DataBase"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <Icon Value="0"/>
+    </General>
+    <i18n>
+      <EnableI18N LFM="False"/>
+    </i18n>
+    <VersionInfo>
+      <StringTable ProductVersion=""/>
+    </VersionInfo>
+    <BuildModes Count="1">
+      <Item1 Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <IncludeFileFilter Value="*.(pas|pp|inc|lfm|lpr|lrs|lpi|lpk|sh|xml)"/>
+      <ExcludeFileFilter Value="*.(bak|ppu|o|so);*~;backup"/>
+    </PublishOptions>
+    <RunParams>
+      <local>
+        <FormatVersion Value="1"/>
+      </local>
+    </RunParams>
+    <RequiredPackages Count="3">
+      <Item1>
+        <PackageName Value="FCL"/>
+      </Item1>
+      <Item2>
+        <PackageName Value="SQLDBLaz"/>
+      </Item2>
+      <Item3>
+        <PackageName Value="LCL"/>
+      </Item3>
+    </RequiredPackages>
+    <Units Count="14">
+      <Unit0>
+        <Filename Value="DataBase.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DataBase"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="main.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="MainForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="main"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="metadata.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="metadata"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="utableform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="TableForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="utableform"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="querycreate.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="querycreate"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="ufilter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ufilter"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="ueditform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="EditForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="ueditform"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="Images\ufilterform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FilterForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFilterForm"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="dbcomponentcreate.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="DBComponentCreate"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="uedit.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UEdit"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="uscheduleform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="ScheduleForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UScheduleForm"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="ucheckboxframe.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="CheckBoxFrame"/>
+        <ResourceBaseClass Value="Frame"/>
+        <UnitName Value="UCheckBoxFrame"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="ucheckgroupform.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="CheckGroupForm"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UCheckGroupForm"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="uexport.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UExport"/>
+      </Unit13>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="DataBase"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="Images"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+    <Other>
+      <CompilerMessages>
+        <MsgFileName Value=""/>
+      </CompilerMessages>
+      <CompilerPath Value="$(CompPath)"/>
+    </Other>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions Count="3">
+      <Item1>
+        <Name Value="EAbort"/>
+      </Item1>
+      <Item2>
+        <Name Value="ECodetoolError"/>
+      </Item2>
+      <Item3>
+        <Name Value="EFOpenError"/>
+      </Item3>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

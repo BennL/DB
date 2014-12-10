@@ -1,8 +1,8 @@
 object EditForm: TEditForm
-  Left = 152
+  Left = 299
   Height = 0
-  Top = 259
-  Width = 253
+  Top = 52
+  Width = 271
   BorderStyle = bsSingle
   Caption = 'Редактирование'
   LCLVersion = '1.2.6.0'

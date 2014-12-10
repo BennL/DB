@@ -17,6 +17,7 @@ procedure ShowUpdateTable(aSQLQuery: TSQLQuery; aUQuery: string;
   aParam: array of string);
 procedure SetQuery(aSQLQuery: TSQLQuery; aQuery: string);
 procedure SetParamQuery(aSQLQuery: TSQLQuery; aQuery: string; aParam: array of string);
+procedure SetScheduleQuery(aSQLQuery: TSQLQuery; aQuery: string);
 procedure SetUpdateQuery(aSQLQuery: TSQLQuery; aQuery: string; aParam: array of string);
 function CreateQuery(aTable: TTableInfo): string;
 procedure SetCaption(aDBGrid: TDBGrid; aTable: TTableInfo);
@@ -83,6 +84,18 @@ begin
       ParamByName('p' + IntToStr(i)).AsString := aParam[i];
     end;
     Open;
+  end;
+end;
+
+procedure SetScheduleQuery(aSQLQuery: TSQLQuery; aQuery: string);
+var
+  i: integer;
+begin
+  with aSQLQuery do
+  begin
+    Close;
+    SQL.Text := aQuery;
+    ExecSQL;
   end;
 end;
 

@@ -1,17 +1,17 @@
 object ScheduleForm: TScheduleForm
-  Left = 133
-  Height = 750
-  Top = 47
+  Left = 343
+  Height = 642
+  Top = 75
   Width = 1172
   Caption = 'Расписание'
-  ClientHeight = 750
+  ClientHeight = 642
   ClientWidth = 1172
   OnCreate = FormCreate
   LCLVersion = '1.2.6.0'
   object DrawGrid: TDrawGrid
     Left = 0
-    Height = 688
-    Top = 64
+    Height = 580
+    Top = 56
     Width = 1172
     Anchors = [akTop, akLeft, akRight, akBottom]
     ExtendedSelect = False
@@ -19,9 +19,13 @@ object ScheduleForm: TScheduleForm
     TabOrder = 0
     OnClick = DrawGridClick
     OnDblClick = DrawGridDblClick
+    OnDragDrop = DrawGridDragDrop
+    OnDragOver = DrawGridDragOver
     OnDrawCell = DrawGridDrawCell
+    OnEndDrag = DrawGridEndDrag
     OnMouseDown = DrawGridMouseDown
     OnMouseMove = DrawGridMouseMove
+    OnStartDrag = DrawGridStartDrag
   end
   object RefreshBtn: TBitBtn
     Left = -296
@@ -370,7 +374,7 @@ object ScheduleForm: TScheduleForm
     Left = 488
     Height = 31
     Top = 8
-    Width = 160
+    Width = 155
     Caption = 'Экспорт'
     Glyph.Data = {
       36040000424D3604000000000000360000002800000010000000100000000100
